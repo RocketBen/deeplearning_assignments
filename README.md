@@ -1,2 +1,16 @@
 # deeplearning_assignments
-Assignments of deeplearning study in 2021 summer 
+2021暑期深度学习课程实验
+
+# TODO:
+
+## CV:
+
+### 1. 图像分类：CIFAR-10（50,000训练，10,000测试，十分类）
+
+### 2. 图像生成：CelebA（202,599张人脸图像）
+
+## NLP：
+
+### 1. 文本分类：IMDB（25,000训练，25,000测试，二分类）
+
+### 2. 机器翻译：CMN-ENG（18,000训练，500验证，2636测试，英文到中文的翻译数据集）
