@@ -1,7 +1,7 @@
 # deeplearning_assignments
 2021暑期深度学习课程实验
 
-# TODO:
+# TO DO:
 
 ## CV:
 
