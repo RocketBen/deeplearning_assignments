@@ -51,7 +51,7 @@ class Cifar10Dataset(data.Dataset):
         if self.transform:
             img = self.transform(img)
         if self.one_hot:
-            # change label to ont-hot format
+            # change label to ont-hot format if needed
             label = torch.zeros(self.num_classes).scatter_(0, torch.LongTensor([label, ]), 1).to(torch.long)
         return img, label
 
