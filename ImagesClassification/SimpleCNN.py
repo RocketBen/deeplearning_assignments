@@ -65,11 +65,9 @@ class Net(nn.Module):
         return x
 
 
-device = torch.device('cuda')
-network = torchvision.models.resnet18(pretrained=True)
-network.fc = nn.Linear(network.fc.in_features, 10)
-network = network.to(device)
-lr = 5e-3
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+network = Net().to(device)
+lr = 1e-3
 LossFunc = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(network.parameters(), lr)
 epochs = 100
