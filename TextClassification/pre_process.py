@@ -1,7 +1,3 @@
-"""
-a pre-process script for IMDB dataset
-tokenize and vectorize the sentence using spacy and combine multiple txt and its label as a single csv file
-"""
 import os
 from os.path import join
 import spacy
