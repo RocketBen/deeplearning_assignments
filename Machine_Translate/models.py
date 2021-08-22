@@ -20,8 +20,10 @@ class LSTM(nn.Module):
         else:
             self.en_embed_layer = nn.Embedding(en_vocab_size, embed_size)
             self.zh_embed_layer = nn.Embedding(zh_vocab_size, embed_size)
-        self.encoder = nn.LSTM(embed_size, embed_size, bidirectional=False, batch_first=True)
-        self.decoder = nn.LSTM(embed_size, embed_size, bidirectional=False, batch_first=True)
+        self.encoder = nn.LSTM(embed_size, embed_size, bidirectional=False, batch_first=True, num_layers=2,
+                               dropout=0.15)
+        self.decoder = nn.LSTM(embed_size, embed_size, bidirectional=False, batch_first=True, num_layers=2,
+                               dropout=0.15)
         self.fc = nn.Linear(embed_size, zh_vocab_size)
         self.zh_vocab = None
         self.en_spacy = None
@@ -53,7 +55,9 @@ class LSTM(nn.Module):
                 self.en_spacy = spacy.load('en_core_web_md')
             if self.en_vocab is None:
                 self.en_vocab = MTVocab('en')
-            en_input = [str(w) for w in self.en_spacy(en_input)]
+            en_input = ['<bos>'] + [str(w) for w in self.en_spacy(en_input)] + ['<eos>']
+            while len(en_input) < max_seq_len:
+                en_input.append('<pad>')
             en_input = [self.en_vocab.get_index(w) for w in en_input]
             en_input = torch.LongTensor(en_input).unsqueeze(0).to(self.fc.weight.device)
         en_embed = self.en_embed_layer(en_input)
@@ -117,7 +121,7 @@ class MultiHeadSelfAttnLayer(nn.Module):
         weighted_sum = weighted_sum.transpose(1, 2)  # (batch, q_len, num_head, head_dim)
         weighted_sum = weighted_sum.reshape(batch, q_len, d_model)
         output = torch.matmul(weighted_sum, self.W_o)  # (batch, k_len,d_model)
-        output = F.dropout(output, 0.1)
+        output = F.dropout(output, 0.2)
         return output
 
 
@@ -201,8 +205,8 @@ class Transformer(nn.Module):
             self.en_embed_layer = nn.Embedding(en_vocab_size, embed_size)
             self.zh_embed_layer = nn.Embedding(zh_vocab_size, embed_size)
 
-        self.encoder = Encoder(embed_size, num_head=3, num_layer=1)
-        self.decoder = Decoder(embed_size, num_head=3, num_layer=1)
+        self.encoder = Encoder(embed_size, num_head=3, num_layer=2)
+        self.decoder = Decoder(embed_size, num_head=3, num_layer=2)
         position_encoding = get_pos_encoding_matrix(embed_size, max_seq_len)
         decoder_mask = get_attn_mask(max_seq_len - 1)
         self.register_buffer('position_encoding', position_encoding)
@@ -221,7 +225,10 @@ class Transformer(nn.Module):
         en_embed += self.position_encoding[:en_batch_len, :]
         zh_embed += self.position_encoding[:zh_batch_len, :]
         encoder_out = self.encoder(en_embed)
-        decoder_out = self.decoder(zh_embed, encoder_out, self.decoder_mask)
+        decoder_mask = self.decoder_mask
+        if self.decoder_mask.shape[1] != zh_embed.shape[1]:
+            decoder_mask = get_attn_mask(zh_embed.shape[1]).to(zh_embed.device)
+        decoder_out = self.decoder(zh_embed, encoder_out, decoder_mask)
         fc_out = self.fc(decoder_out)
         log_probs = F.log_softmax(fc_out, dim=2)
         loss = F.nll_loss(log_probs.reshape(log_probs.shape[0] * log_probs.shape[1], -1),
@@ -234,12 +241,14 @@ class Transformer(nn.Module):
             if self.zh_vocab is None:
                 self.zh_vocab = MTVocab('zh')
             if type(en_input) is str:
+                en_input = en_input.lower()
                 if self.en_spacy is None:
                     self.en_spacy = spacy.load('en_core_web_md')
                 if self.en_vocab is None:
                     self.en_vocab = MTVocab('en')
                 en_input = ['<bos>'] + [str(w) for w in self.en_spacy(en_input)] + ['<eos>']
-                print(en_input)
+                while len(en_input) < max_seq_len:
+                    en_input.append('<pad>')
                 en_input = [self.en_vocab.get_index(w) for w in en_input]
                 en_input = torch.LongTensor(en_input).unsqueeze(0).to(self.fc.weight.device)
             en_seq_len = en_input.shape[1]

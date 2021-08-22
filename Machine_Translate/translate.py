@@ -3,24 +3,38 @@ import models
 import torch
 from torch.utils import data
 from matplotlib import pyplot as plt
-ckpt_path = '/home/clb/PycharmProjects/deeplearning_assiments/Machine_Translation/transformer_2800_0.5380.pth'
 
-device = torch.device('cuda:3')
-model = models.Transformer()
+device = torch.device('cuda:2')
+
+ckpt_path = '/home/clb/PycharmProjects/deeplearning_assiments/Machine_Translation/transformer_11000_0.5236.pth'
+transformer = models.Transformer()
 ckpt = torch.load(ckpt_path)
-model.load_state_dict(ckpt['model'])
-model = model.to(device)
-
-
+transformer.load_state_dict(ckpt['model'])
+transformer = transformer.to(device)
+ckpt_path = '/home/clb/PycharmProjects/deeplearning_assiments/Machine_Translation/LSTM_8000_0.3259.pth'
+lstm = models.LSTM()
+ckpt = torch.load(ckpt_path)
+lstm.load_state_dict(ckpt['model'])
+lstm = lstm.to(device)
+vis = False
 if __name__ == '__main__':
     with torch.no_grad():
-        x = 'mathematics is my favorite subject.'
-        y = model.translate(x)
-        print(y)
-        attn = model.decoder.tfblocks[0].self_attn_layer.attention_score.squeeze().cpu().numpy()
-        plt.figure()
-        for i in range(3):
-            plt.subplot(1, 3, i + 1)
-            plt.imshow(attn[i, :, :])
-        plt.suptitle(x + '\n' + y)
-        plt.show()
+        data = []
+        with open('./CMN-ENG/cmn.txt') as f:
+            for line in f:
+                en, zh, _ = line.strip().split('\t')
+                data.append((en, zh))
+        random.shuffle(data)
+        for en, zh in data[:10]:
+            print('input: ', en)
+            print('label: ', zh)
+            print('lstm: ', lstm.translate(en)[0])
+            print('transformer: ', transformer.translate(en)[0])
+            if vis:
+                attn = transformer.decoder.tfblocks[0].self_attn_layer.attention_score.cpu().numpy()[0]
+                plt.figure()
+                plt.suptitle(en)
+                for i in range(attn.shape[0]):
+                    plt.subplot(1, attn.shape[0], i + 1)
+                    plt.imshow(attn[i])
+                plt.show()

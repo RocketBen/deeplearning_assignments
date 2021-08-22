@@ -8,12 +8,12 @@ from matplotlib import pyplot as plt
 import random
 
 device = torch.device('cuda:2')
-epochs = 50
-batch_size = 128
-lr = 5e-4
-ckpt_path = None
+epochs = 80
+batch_size = 4
+lr = 1e-5
+ckpt_path = '/home/clb/PycharmProjects/deeplearning_assiments/Machine_Translation/transformer_11000_0.5236.pth'
 save = True
-force_pad = True
+force_pad = False
 
 model = models.Transformer(use_embed_pretain=True, freeze_embedding=False)
 model.to(device)
@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 tqdm.write('iter: {}  train_loss: {}'.format(iter, loss))
                 train_iters.append(iter)
                 train_losses.append(loss.item())
-            if iter % 200 == 0:
+            if iter % 2000 == 0:
                 accu, test_loss, example = model_test(model, device=device, test_loader=test_loader)
                 tqdm.write('iter: {}  test_accu: {}, test_loss: {} '.format(iter, accu, test_loss))
                 tqdm.write(example[0] + '\n' + example[1] + '\n' + example[2])
@@ -81,7 +81,7 @@ if __name__ == '__main__':
                 test_losses.append(test_loss)
                 # 可视化
                 visualization()
-                if save:
+                if save and accu > 0.2:
                     torch.save({'model': model.state_dict(),
                                 'iter': iter,
                                 'opti': opti.state_dict(),
