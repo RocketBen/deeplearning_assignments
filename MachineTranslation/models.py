@@ -141,6 +141,7 @@ class TransformerBlock(nn.Module):
         x_norm1 = self.norm1(x)
         x = self.feed_forward(x)
         x += x_norm1
+        x = self.norm2(x)
         return x
 
 
