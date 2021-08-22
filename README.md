@@ -19,6 +19,6 @@
 使用了两个模型，分别是基于LSTM的seq2seq，和自己复现的transformer，验证集精度分别能达到31.58%和51.55%  
 可能是数据集比较简单，两个模型编码器和解码器部分都只用了两层，增加层数反而效果更差  
 decoder做翻译的时候用最简单的贪心选词，下面是一些效果展示  
-![image](deeplearning_assignments/Images/translation_examples.png)  
+![image](https://github.com/cenlibin/deeplearning_assignments/blob/main/Images/translation_examples.png)  
 绘制了一下attention的可视化（三个头）  
-![image](deeplearning_assignments/Images/attention_heatmap.png)  
+![image](https://github.com/cenlibin/deeplearning_assignments/blob/main/Images/attention_heatmap.png)  
