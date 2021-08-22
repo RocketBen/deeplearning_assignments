@@ -16,5 +16,5 @@
 此外，用了spacy的词向量初始化embedding层
 一些翻译效果：  
 ![image](https://github.com/cenlibin/deeplearning_assignments/blob/main/Images/translation_examples.png)  
-绘制了一下attention的可视化（三个头）:   
+绘制了一下attention的可视化（3个head）:   
 ![image](https://github.com/cenlibin/deeplearning_assignments/blob/main/Images/attention_heatmap.png)  
