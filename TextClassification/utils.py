@@ -94,10 +94,10 @@ class ImdbVocab:
 
     def get_word(self, index):
         try:
-            index = self._index2word[index]
+            word = self._index2word[index]
         except IndexError:
-            index = -1
-        return index
+            word = '<unk>'
+        return word
 
     def __len__(self):
         return len(self._index2word)
@@ -108,6 +108,7 @@ def model_test(model, device, test_loader, test_len=None):
     ave_loss = 0
     if not test_len:
         test_len = len(test_loader)
+    test_len = min(test_len, len(test_loader))
     with torch.no_grad():
         for i, (test_x, test_y) in tqdm(enumerate(test_loader), total=test_len, desc='test', leave=False):
             if i == test_len:
