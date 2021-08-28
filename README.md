@@ -3,16 +3,24 @@
 
 
 #  图像分类：CIFAR-10
-
-
+参考Resnet论文中跑CIFAR-10的方法搭了两个不同深度的模型做分类  
+残差块确实能比较好减少网络退化，瓶颈层也能减少计算量  
+炼丹手法不够，精度差得有点多  
+| num_layers | 22 | 122 |
+| ----- | ------ | ------ |
+| accuracy | 73.48 | 77.20|
 # 图像生成：CelebA
-
-
+参考了这篇[DCGAN](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)教程，
+加深了网络图片大小改至128，并参考了一些训练GAN的trick（LeakyRelu，平滑标签）  
+效果展示：  
+![image](https://github.com/cenlibin/deeplearning_assignments/blob/main/Images/grid.png)  
+训练不同阶段的生成效果：  
+![image](https://github.com/cenlibin/deeplearning_assignments/blob/main/Images/face.gif)  
 # 文本分类：IMDB
 尝试了多个模型，效果最好的是最简单的[EmebddingBag](https://pytorch.org/tutorials/beginner/text_sentiment_ngrams_tutorial.html)  
 可能是任务比较简单，复杂的模型反而特别容易过拟合  
  | model | RNN | LSTM | Bidirectional-LSTM | Transformer | EmbeddingBag |     
- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |  
+ | --- | ------- | ------ | ------- | -------- | -------- |  
  | accuracy | 74.57 | 83.26 | 84.32 | 80.42 | 87.35 | 
 
 # 机器翻译：CMN-ENG
